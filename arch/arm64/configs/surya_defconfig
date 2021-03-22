@@ -1,6 +1,6 @@
 #
 # Automatically generated file; DO NOT EDIT.
-# Linux/arm64 4.14.312 Kernel Configuration
+# Linux/arm64 4.14.314 Kernel Configuration
 #
 CONFIG_ARM64=y
 CONFIG_64BIT=y
@@ -1546,6 +1546,7 @@ CONFIG_UID_SYS_STATS=y
 # CONFIG_MEMORY_STATE_TIME is not set
 # CONFIG_QPNP_MISC is not set
 CONFIG_LDO_WL2866D=y
+CONFIG_FORCE_FAST_CHARGE=y
 # CONFIG_C2PORT is not set
 
 #
