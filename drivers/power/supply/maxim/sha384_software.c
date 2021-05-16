@@ -31,6 +31,9 @@
 *******************************************************************************
 */
 //  SHA3_HMAC - HMAC using SHA3-256
+
+#pragma clang diagnostic ignored "-Wframe-larger-than="
+
 #include "ucl_sha3.h"
 #include <linux/string.h>
 #define SHA3_256_HMAC
