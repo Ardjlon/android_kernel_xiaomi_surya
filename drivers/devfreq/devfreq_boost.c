@@ -35,6 +35,8 @@ struct df_boost_drv {
 	unsigned long last_input_jiffies;
 };
 
+extern int kp_active_mode(void);
+
 static void devfreq_input_unboost(struct work_struct *work);
 static void devfreq_max_unboost(struct work_struct *work);
 
