@@ -1514,17 +1514,8 @@ static int dwc3_remove(struct platform_device *pdev)
 	res->start -= DWC3_GLOBALS_REGS_START;
 #ifdef CONFIG_DEBUG_FS
 	dwc3_debugfs_exit(dwc);
-///<<<<<<< HEAD
 #endif
 	dwc3_gadget_exit(dwc);
-//	pm_runtime_allow(&pdev->dev);
-//=======
-//	dwc3_core_exit_mode(dwc);
-//
-//	dwc3_core_exit(dwc);
-//	dwc3_ulpi_exit(dwc);
-
-//>>>>>>> c9573126ab9e5bc7b8e241aa2995006e0ffd9fce
 	pm_runtime_disable(&pdev->dev);
 	pm_runtime_put_noidle(&pdev->dev);
 	pm_runtime_set_suspended(&pdev->dev);
