@@ -681,6 +681,13 @@ choice
 config PELT_UTIL_HALFLIFE_32
 	bool "32 ms, default for server"
 
+config PELT_UTIL_HALFLIFE_24
+	bool "24 ms, suggested for power efficient interactive workloads"
+	help
+	  Use 24ms as PELT half-life value. Ideal for 60/90hz cadence, with lower
+	  ramp-up and decay than 12ms half life (ideal for 90hz due to <12.5ms
+	  frame signals).
+
 config PELT_UTIL_HALFLIFE_16
 	bool "16 ms, suggested for interactive workloads"
 	help
@@ -688,12 +695,31 @@ config PELT_UTIL_HALFLIFE_16
 	  decay of utlization and load twice as fast as for the default
 	  configuration using 32ms.
 
+config PELT_UTIL_HALFLIFE_12
+	bool "12 ms, very fast"
+	help
+	  A 12ms PELT half-life is suggested for mobile/interactive workloads
+	  where tasks usually run with a 60/90Hz activation cadence.
+
+	  If not sure, use the default of 32 ms
+
+config PELT_UTIL_HALFLIFE_10
+	bool "10 ms, very fast"
+	help
+	  A 10ms PELT half-life is suggested for mobile/interactive workloads
+	  where tasks usually run with a 90Hz activation cadence.
+
+	  If not sure, use the default of 32 ms
+
 config PELT_UTIL_HALFLIFE_8
-	bool "8 ms, very fast"
+	bool "8 ms, more fast"
 	help
 	  Use 8ms as PELT half-life value. This will increase the ramp-up and
 	  decay of utlization and load four time as fast as for the default
 	  configuration using 32ms.
+
+config PELT_UTIL_HALFLIFE_4
+	bool "8/4 ms, more faster"
 
 endchoice
 
