@@ -13,6 +13,7 @@
 
 bool schedtune_initialized = false;
 extern struct reciprocal_value schedtune_spc_rdiv;
+extern int kp_active_mode(void);
 
 /*
  * EAS scheduler tunables for task groups.
@@ -418,7 +419,7 @@ bool schedtune_task_colocated(struct task_struct *p)
 	struct schedtune *st;
 	bool colocated;
 
-	if (unlikely(!schedtune_initialized))
+	if (unlikely(!schedtune_initialized) || (kp_active_mode() == 1))
 		return false;
 
 	/* Get task boost value */
@@ -522,7 +523,7 @@ int schedtune_prefer_idle(struct task_struct *p)
 	struct schedtune *st;
 	int prefer_idle;
 
-	if (unlikely(!schedtune_initialized))
+	if (unlikely(!schedtune_initialized) || (kp_active_mode() == 1))
 		return 0;
 
 	/* Get prefer_idle value */
