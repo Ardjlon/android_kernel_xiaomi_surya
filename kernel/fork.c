@@ -2268,7 +2268,7 @@ long _do_fork(unsigned long clone_flags,
 	   * Dont boost CPU & DDR if battery saver profile is enabled
 	   * and boost CPU & DDR if balanced profile is enabled
 	   */
-	  if (kp_active_mode() == 3 || kp_active_mode() == 0) {
+          if (kp_active_mode() == 3) {
 	    cpu_input_boost_kick_max(50);
 	    devfreq_boost_kick_max(DEVFREQ_MSM_LLCCBW, 75, true);
 	    devfreq_boost_kick_max(DEVFREQ_MSM_CPUBW, 75, true);
