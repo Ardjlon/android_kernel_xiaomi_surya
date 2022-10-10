@@ -172,7 +172,7 @@ int kswapd_threads_current = DEF_KSWAPD_THREADS_PER_NODE;
 /*
  * From 0 .. 200.  Higher means more swappy.
  */
-int vm_swappiness = 200;
+int vm_swappiness = 20;
 #ifdef CONFIG_OPLUS_MM_HACKS
 /*
  * Direct reclaim swappiness, values range from 0 .. 200. Higher means more swappy.
