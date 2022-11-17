@@ -194,7 +194,7 @@ static void vma_stop(struct proc_maps_private *priv)
 	mmput(mm);
 
 	sched_migrate_to_cpumask_end(to_cpumask(&priv->old_cpus_allowed),
-				     cpu_lp_mask);
+				     cpu_perf_mask);
 }
 
 static struct vm_area_struct *
@@ -232,7 +232,7 @@ static void *m_start(struct seq_file *m, loff_t *ppos)
 		return NULL;
 
 	sched_migrate_to_cpumask_start(to_cpumask(&priv->old_cpus_allowed),
-				       cpu_lp_mask);
+				       cpu_perf_mask);
 
 	down_read(&mm->mmap_sem);
 	hold_task_mempolicy(priv);
