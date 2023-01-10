@@ -1854,22 +1854,6 @@ static int do_execveat_common(int fd, struct filename *filename,
 			zygote32_sig = current->signal;
 		else if (unlikely(!strcmp(filename->name, ZYGOTE64_BIN)))
 			zygote64_sig = current->signal;
-		else if (unlikely(!strncmp(filename->name,
-					   HWCOMPOSER_BIN_PREFIX,
-					   strlen(HWCOMPOSER_BIN_PREFIX)))) {
-			current->pc_flags |= PC_PERF_AFFINE;;
-			set_cpus_allowed_ptr(current, cpu_perf_mask);
-		} else if (unlikely(!strncmp(filename->name,
-					   SFLINGER_BIN_PREFIX,
-					   strlen(SFLINGER_BIN_PREFIX)))) {
-			current->pc_flags |= PC_PERF_AFFINE;
-			set_cpus_allowed_ptr(current, cpu_perf_mask);
-		} else if (unlikely(!strncmp(filename->name,
-					   QTIHW_BIN_PREFIX,
-					   strlen(QTIHW_BIN_PREFIX)))) {
-			current->pc_flags |= PC_PERF_AFFINE;
-			set_cpus_allowed_ptr(current, cpu_perf_mask);
-		}
 	}
 
 	/* execve succeeded */
