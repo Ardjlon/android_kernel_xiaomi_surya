@@ -130,3 +130,12 @@ kernel/configs/android-*.cfg
 #Ignoring Android.bp link file
 #
 Android.bp
+
+#
+# Deluxe Kernel Project
+#
+*DEXK*.zip
+dexk
+log.txt
+out
+script_build.sh
