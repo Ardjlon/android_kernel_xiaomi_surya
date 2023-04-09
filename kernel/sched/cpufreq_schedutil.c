@@ -27,9 +27,6 @@ static u64 default_up_delay_lp[] = {0};
 static unsigned int default_efficient_freq_hp[] = {1401600};
 static u64 default_up_delay_hp[] = {100 * NSEC_PER_MSEC};
 
-static unsigned int default_efficient_freq_pr[] = {1804800};
-static u64 default_up_delay_pr[] = {100 * NSEC_PER_MSEC};
-
 struct sugov_tunables {
 	struct gov_attr_set attr_set;
 	unsigned int up_rate_limit_us;
@@ -657,8 +654,7 @@ static ssize_t efficient_freq_store(struct gov_attr_set *attr_set,
 	    tunables->nefficient_freq = new_num;
 	    tunables->current_step = 0;
 	    if (old != default_efficient_freq_lp
-	     && old != default_efficient_freq_hp
-	     && old != default_efficient_freq_pr)
+	     && old != default_efficient_freq_hp)
 	        kfree(old);
 	}
 
@@ -680,8 +676,7 @@ static ssize_t up_delay_store(struct gov_attr_set *attr_set,
 	    tunables->nup_delay = new_num;
 	    tunables->current_step = 0;
 	    if (old != default_up_delay_lp
-	     && old != default_up_delay_hp
-	     && old != default_up_delay_pr)
+	     && old != default_up_delay_hp)
 	        kfree(old);
 	}
 
@@ -906,11 +901,6 @@ if (cpumask_test_cpu(sg_policy->policy->cpu, cpu_lp_mask)) {
     		tunables->nefficient_freq = ARRAY_SIZE(default_efficient_freq_hp);
 		tunables->up_delay = default_up_delay_hp;
 		tunables->nup_delay = ARRAY_SIZE(default_up_delay_hp);
-	} else if (cpumask_test_cpu(sg_policy->policy->cpu, cpu_prime_mask)) {
-		tunables->efficient_freq = default_efficient_freq_pr;
-    		tunables->nefficient_freq = ARRAY_SIZE(default_efficient_freq_pr);
-		tunables->up_delay = default_up_delay_pr;
-		tunables->nup_delay = ARRAY_SIZE(default_up_delay_pr);
 	}
 
 	policy->governor_data = sg_policy;
