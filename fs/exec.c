@@ -1850,10 +1850,11 @@ static int do_execveat_common(int fd, struct filename *filename,
 		goto out;
 
 	if (is_global_init(current->parent)) {
-		if (unlikely(!strcmp(filename->name, ZYGOTE32_BIN)))
+		if (unlikely(!strcmp(filename->name, ZYGOTE32_BIN))) {
 			zygote32_sig = current->signal;
-		else if (unlikely(!strcmp(filename->name, ZYGOTE64_BIN)))
+		} else if (unlikely(!strcmp(filename->name, ZYGOTE64_BIN))) {
 			zygote64_sig = current->signal;
+                }
 	}
 
 	/* execve succeeded */
