@@ -134,7 +134,7 @@ Android.bp
 #
 # Deluxe Kernel Project
 #
-*DEXK*.zip
+*.zip
 dexk
 log.txt
 out
