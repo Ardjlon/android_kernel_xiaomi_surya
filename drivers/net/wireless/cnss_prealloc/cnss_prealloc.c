@@ -30,8 +30,6 @@ static DEFINE_SPINLOCK(alloc_lock);
 #define PRE_ALLOC_DEBUGFS_DIR		"cnss-prealloc"
 #define PRE_ALLOC_DEBUGFS_FILE_OBJ	"status"
 
-static struct dentry *debug_base;
-
 struct wcnss_prealloc {
 	int occupied;
 	size_t size;

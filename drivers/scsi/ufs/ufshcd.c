@@ -54,12 +54,8 @@
 #include "ufs-debugfs.h"
 #include "ufs-qcom.h"
 
-static bool ufshcd_wb_sup(struct ufs_hba *hba);
 static int ufshcd_wb_ctrl(struct ufs_hba *hba, bool enable);
-static int ufshcd_wb_buf_flush_enable(struct ufs_hba *hba);
 static int ufshcd_wb_buf_flush_disable(struct ufs_hba *hba);
-static bool ufshcd_wb_is_buf_flush_needed(struct ufs_hba *hba);
-static int ufshcd_wb_toggle_flush_during_h8(struct ufs_hba *hba, bool set);
 
 #ifdef CONFIG_DEBUG_FS
 
@@ -2972,7 +2968,6 @@ static void ufshcd_hibern8_on_idle_switch_work(struct work_struct *work)
 	}
 
 	hba->hibern8_on_idle.is_enabled = value;
-out:
 	return;
 }
 
@@ -7050,29 +7045,6 @@ out:
 }
 
 #if 1
-static bool ufshcd_wb_sup(struct ufs_hba *hba)
-{
-	return false;
-}
-#else
-static bool ufshcd_wb_sup(struct ufs_hba *hba)
-{
-#if defined(CONFIG_UFSTW)
-#if defined(CONFIG_UFSFEATURE31)
-	if (is_samsung_ufs(hba))
-		return false;
-#elif defined(CONFIG_UFSFEATURE30)
-	return false;
-#endif
-#endif
-	return ((hba->dev_info.d_ext_ufs_feature_sup &
-		   UFS_DEV_WRITE_BOOSTER_SUP) &&
-		  (hba->dev_info.b_wb_buffer_type
-		   || hba->dev_info.wb_config_lun));
-}
-#endif
-
-#if 1
 static int ufshcd_wb_ctrl(struct ufs_hba *hba, bool enable)
 {
 	return 1;
@@ -7108,58 +7080,6 @@ static int ufshcd_wb_ctrl(struct ufs_hba *hba, bool enable)
 #endif
 
 #if 1
-static int ufshcd_wb_toggle_flush_during_h8(struct ufs_hba *hba, bool set)
-{
-	return 1;
-}
-#else
-static int ufshcd_wb_toggle_flush_during_h8(struct ufs_hba *hba, bool set)
-{
-	int val, ret;
-
-	if (set)
-		val =  UPIU_QUERY_OPCODE_SET_FLAG;
-	else
-		val = UPIU_QUERY_OPCODE_CLEAR_FLAG;
-
-	ret = ufshcd_query_flag_retry(hba, val,
-			       QUERY_FLAG_IDN_WB_BUFF_FLUSH_DURING_HIBERN8,
-				       NULL);
-	if (ret)
-		dev_err(hba->dev,
-			"%s: Write-Booster - flush during H8 failed %d\n",
-			__func__, ret);
-
-	return ret;
-
-}
-#endif
-
-#if 1
-static int ufshcd_wb_buf_flush_enable(struct ufs_hba *hba)
-{
-	return 0;
-}
-#else
-static int ufshcd_wb_buf_flush_enable(struct ufs_hba *hba)
-{
-	int ret;
-
-	if (!ufshcd_wb_sup(hba) || hba->wb_buf_flush_enabled)
-		return 0;
-
-	ret = ufshcd_query_flag_retry(hba, UPIU_QUERY_OPCODE_SET_FLAG,
-				      QUERY_FLAG_IDN_WB_BUFF_FLUSH_EN, NULL);
-	if (ret)
-		dev_err(hba->dev,
-			"%s Write-Booster - buf flush enable failed %d\n",
-			__func__, ret);
-
-	return ret;
-}
-#endif
-
-#if 1
 static int ufshcd_wb_buf_flush_disable(struct ufs_hba *hba)
 {
 	return 0;
@@ -7180,87 +7100,6 @@ static int ufshcd_wb_buf_flush_disable(struct ufs_hba *hba)
 			__func__, ret);
 
 	return ret;
-}
-#endif
-
-#if 1
-static bool ufshcd_wb_is_buf_flush_needed(struct ufs_hba *hba)
-{
-	return false;
-}
-#else
-static bool ufshcd_wb_is_buf_flush_needed(struct ufs_hba *hba)
-{
-	int ret;
-	u32 cur_buf, status, avail_buf;
-
-	if (!ufshcd_wb_sup(hba))
-		return false;
-
-	ret = ufshcd_query_attr_retry(hba, UPIU_QUERY_OPCODE_READ_ATTR,
-				      QUERY_ATTR_IDN_AVAIL_WB_BUFF_SIZE,
-				      0, 0, &avail_buf);
-	if (ret) {
-		dev_err(hba->dev,
-			"%s Write-Booster WBBufferSize read failed %d\n",
-			 __func__, ret);
-		return false;
-	}
-
-	ret = ufshcd_vops_get_user_cap_mode(hba);
-	if (ret <= 0) {
-		dev_err(hba->dev,
-			"WB Get user-cap reduction mode: failed: %d\n",
-			ret);
-		/* Most commonly used */
-		ret = UFS_WB_BUFF_PRESERVE_USER_SPACE;
-	}
-
-	hba->dev_info.keep_vcc_on = false;
-	if (ret == UFS_WB_BUFF_USER_SPACE_RED_EN) {
-		if (avail_buf <= UFS_WB_10_PERCENT_BUF_REMAIN) {
-			hba->dev_info.keep_vcc_on = true;
-			return true;
-		}
-		return false;
-	} else if (ret == UFS_WB_BUFF_PRESERVE_USER_SPACE) {
-		ret = ufshcd_query_attr_retry(hba, UPIU_QUERY_OPCODE_READ_ATTR,
-					      QUERY_ATTR_IDN_CURR_WB_BUFF_SIZE,
-					      0, 0, &cur_buf);
-		if (ret) {
-			dev_err(hba->dev, "%s Write-Booster WBBS failed %d\n",
-				 __func__, ret);
-			return false;
-		}
-
-		if (!cur_buf) {
-			dev_err(hba->dev,
-				"%d Write-Booster disabled until space avail\n",
-				 cur_buf);
-			return false;
-		}
-
-		ret = ufshcd_get_ee_status(hba, &status);
-		if (ret) {
-			dev_err(hba->dev,
-				"%s: Write-Booster failed to get e-status %d\n",
-				__func__, ret);
-			if (avail_buf < UFS_WB_40_PERCENT_BUF_REMAIN) {
-				hba->dev_info.keep_vcc_on = true;
-				return true;
-			}
-			return false;
-		}
-
-		status &= hba->ee_ctrl_mask;
-
-		if ((status & MASK_EE_URGENT_BKOPS) ||
-		    (avail_buf < UFS_WB_40_PERCENT_BUF_REMAIN)) {
-			hba->dev_info.keep_vcc_on = true;
-			return true;
-		}
-	}
-	return false;
 }
 #endif
 
@@ -9885,12 +9724,6 @@ static int ufshcd_ioctl(struct scsi_device *dev, int cmd, void __user *buffer)
 
 	return err;
 }
-
-static const struct attribute_group *ufshcd_driver_groups[] = {
-	&ufs_sysfs_unit_descriptor_group,
-	&ufs_sysfs_lun_attributes_group,
-	NULL,
-};
 
 static struct scsi_host_template ufshcd_driver_template = {
 	.module			= THIS_MODULE,

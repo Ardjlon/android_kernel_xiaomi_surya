@@ -640,36 +640,6 @@ static void dp_display_send_hpd_event(struct dp_display_private *dp)
 			envp);
 }
 
-static void dp_display_post_open(struct dp_display *dp_display)
-{
-	struct drm_connector *connector;
-	struct dp_display_private *dp;
-
-	if (!dp_display) {
-		pr_debug("invalid input\n");
-		return;
-	}
-
-	dp = container_of(dp_display, struct dp_display_private, dp_display);
-	if (IS_ERR_OR_NULL(dp)) {
-		pr_debug("invalid params\n");
-		return;
-	}
-
-	connector = dp->dp_display.base_connector;
-
-	if (!connector) {
-		pr_debug("connector not set\n");
-		return;
-	}
-
-	/* if cable is already connected, send notification */
-	if (dp->hpd->hpd_high)
-		queue_work(dp->wq, &dp->connect_work);
-	else
-		dp_display->post_open = NULL;
-}
-
 static int dp_display_send_hpd_notification(struct dp_display_private *dp)
 {
 	int ret = 0;

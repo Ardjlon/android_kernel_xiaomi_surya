@@ -214,7 +214,6 @@ static unsigned int get_next_freq(struct sugov_policy *sg_policy,
 static void sugov_get_util(unsigned long *util, unsigned long *max, int cpu)
 {
 	unsigned long max_cap;
-	struct rq *rq = cpu_rq(cpu);
 
 	max_cap = arch_scale_cpu_capacity(NULL, cpu);
 
